@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>관리자 퀴즈 결과</title>
+</head>
+<body>
+<h1>관리자 퀴즈 결과</h1>
+
+<h2>사용자별 결과</h2>
+<table border="1" cellpadding="5">
+<tr>
+<th>사용자ID</th><th>진단명</th><th>TP</th><th>FN</th><th>FP</th><th>TN</th>
+<th>Sensitivity</th><th>Specificity</th><th>PPV</th><th>NPV</th><th>삭제</th>
+</tr>
+{% for uid, metrics in stats.items() %}
+    {% if metrics %}
+        {% for diag, vals in metrics.items() %}
+        <tr>
+            <td>{{ uid }}</td>
+            <td>{{ diag }}</td>
+            <td>{{ vals.TP }}</td>
+            <td>{{ vals.FN }}</td>
+            <td>{{ vals.FP }}</td>
+            <td>{{ vals.TN }}</td>
+            <td>{{ (vals.Sensitivity*100)|round(2) if vals.Sensitivity is not none else 'N/A' }}%</td>
+            <td>{{ (vals.Specificity*100)|round(2) if vals.Specificity is not none else 'N/A' }}%</td>
+            <td>{{ (vals.PPV*100)|round(2) if vals.PPV is not none else 'N/A' }}%</td>
+            <td>{{ (vals.NPV*100)|round(2) if vals.NPV is not none else 'N/A' }}%</td>
+            <td>
+                <form action="{{ url_for('delete_user', uid=uid) }}" method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                    <button type="submit">삭제</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td>{{ uid }}</td><td colspan="9">결과 없음</td>
+            <td>
+                <form action="{{ url_for('delete_user', uid=uid) }}" method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                    <button type="submit">삭제</button>
+                </form>
+            </td>
+        </tr>
+    {% endif %}
+{% endfor %}
+</table>
+
+<a href="{{ url_for('logout') }}">로그아웃</a>
+</body>
+</html>

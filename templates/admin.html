@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>관리자 페이지</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ccc; padding: 5px; text-align: center; }
+        th { background-color: #eee; }
+    </style>
+</head>
+<body>
+    <h1>관리자 페이지</h1>
+    <a href="{{ url_for('logout') }}">로그아웃</a>
+
+    {% for uid, user_stats in stats.items() %}
+        <h2>{{ uid }}</h2>
+        {% if user_stats %}
+            <table>
+                <tr>
+                    <th>Diagnosis</th>
+                    <th>TP</th>
+                    <th>FP</th>
+                    <th>TN</th>
+                    <th>FN</th>
+                    <th>Sensitivity</th>
+                    <th>Specificity</th>
+                    <th>PPV</th>
+                    <th>NPV</th>
+                </tr>
+                {% for diag, m in user_stats.items() %}
+                <tr>
+                    <td>{{ diag }}</td>
+                    <td>{{ m.TP }}</td>
+                    <td>{{ m.FP }}</td>
+                    <td>{{ m.TN }}</td>
+                    <td>{{ m.FN }}</td>
+                    <td>{{ "%.2f"|format(m.Sensitivity*100) if m.Sensitivity is not none else "N/A" }}%</td>
+                    <td>{{ "%.2f"|format(m.Specificity*100) if m.Specificity is not none else "N/A" }}%</td>
+                    <td>{{ "%.2f"|format(m.PPV*100) if m.PPV is not none else "N/A" }}%</td>
+                    <td>{{ "%.2f"|format(m.NPV*100) if m.NPV is not none else "N/A" }}%</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>결과 없음</p>
+        {% endif %}
+
+        <!-- 사용자 삭제 버튼 -->
+        <form method="post" action="{{ url_for('delete_user', uid=uid) }}" style="margin-bottom:40px;">
+            <button type="submit">사용자 삭제</button>
+        </form>
+    {% endfor %}
+
+    <!-- ⚠️ 이미지 관련 안내 -->
+    <!-- 
+        - Optomap 이미지가 깨지는 경우:
+            1. 파일을 RGB 색상 모드로 다시 저장
+            2. JPEG 형식(.jpg) 유지
+            3. 파일명을 정확히 Flask 코드와 일치시키기 (대소문자 구분)
+        - 웹 브라우저에서 직접 확인 가능:
+            http://127.0.0.1:5000/static/images/Figure1A.jpg
+    -->
+</body>
+</html>
